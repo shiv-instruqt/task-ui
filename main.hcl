@@ -8,13 +8,13 @@ resource "lab" "main" {
     theme = "modern-dark"
 
     timelimit {
-      duration   = "15m"
+      duration   = "30m"
       show_timer = true
     }
 
     idle {
       enabled      = true
-      timeout      = "5m"
+      timeout      = "10m"
       show_warning = true
     }
 
