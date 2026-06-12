@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+echo "Logging into Docker Hub..."
+
+echo "$Docker_pass" | docker login -u "$Docker_user" --password-stdin
+
+echo "Pulling latest image..."
+
+docker pull shivtushal/git-lab:python-app-1.0
+
+echo "Removing existing container if present..."
+
+docker stop flask-app 2>/dev/null || true
+docker rm flask-app 2>/dev/null || true
+
+echo "Starting container..."
+
+docker run -d \
+  --name flask-app \
+  --restart unless-stopped \
+  -p 5000:5000 \
+  shivtushal/git-lab:python-app-1.0
+
+echo "Deployment completed."
+
+docker ps
