@@ -4,6 +4,9 @@ resource "network" "task-vpc" {
 
 
 
+
+
+
 resource "container" "task-1" {
   network {
     id = resource.network.task-vpc.meta.id
