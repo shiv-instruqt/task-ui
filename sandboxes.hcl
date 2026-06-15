@@ -7,6 +7,12 @@ resource "network" "task-vpc" {
 
 
 
+
+
+
+
+
+
 resource "container" "task-1" {
   network {
     id = resource.network.task-vpc.meta.id
@@ -15,8 +21,7 @@ resource "container" "task-1" {
     name = "ubuntu:22.04"
   }
   environment = {
-    "Docker_user" = "shivtushal"
-    "Docker_pass" = "@GOODgod97"
+    "Docker" = "xxxxxx"
   }
   port {
     local    = "80"
