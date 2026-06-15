@@ -10,13 +10,4 @@ resource "task" "docker-ui" {
       cleanup   = false
     }
   }
-  condition "untitled-condition-1" {
-    description = "script"
-    config {
-      target = resource.container.task-1
-    }
-    setup {
-      script = "scripts/task/docker-ui/untitled-condition-1_setup0"
-    }
-  }
 }

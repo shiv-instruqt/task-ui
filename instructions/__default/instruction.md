@@ -1,30 +1,21 @@
-# Run the Flask Application 
+# Run the Flask Application
+
+Since Docker is not available in this environment, we will run the Flask application directly using Python.
 
 ---
 
-## Step 1: Create the application file
-
-Create a new file named `app.py`.
-
-```bash
-nano app.py
-```
-
-Copy the provided Flask application code and paste it into the file.
-
-Save and exit:
-
-- Press `CTRL + X`
-- Press `Y`
-- Press `ENTER`
-
----
-
-## Step 2: Install Python and pip (if required)
+## Step 1: Update the package repository
 
 ```bash
 apt update
-apt install -y python3 python3-pip
+```
+
+---
+
+## Step 2: Install Python, pip, and Nano
+
+```bash
+apt install -y python3 python3-pip nano
 ```
 
 ---
@@ -38,6 +29,17 @@ pip3 install flask
 Verify the installation:
 
 ```bash
+python3 -c "import flask; print(flask.__version__)"
+```
+
+---
+
+## Step 4: Create the Flask Application File
+
+Run the following command:
+
+```bash
+cat > app.py << 'EOF'
 from flask import Flask, jsonify
 import socket
 import urllib.request
@@ -894,17 +896,30 @@ def get_html():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+EOF
+```
+
+Copy the complete Flask application code provided in this lab and paste it between:
+
+```text
+cat > app.py << 'EOF'
+```
+
+and
+
+```text
+EOF
 ```
 
 ---
 
-## Step 4: Run the Flask application
+## Step 5: Run the Flask Application
 
 ```bash
 python3 app.py
 ```
 
-You should see output similar to:
+Expected output:
 
 ```text
 [Server] Private IP : x.x.x.x
@@ -917,11 +932,18 @@ You should see output similar to:
 
 ---
 
-## Step 5: Verify the application
+## Step 6: Verify the Application
 
+Open a new terminal and run:
 
 ```bash
 curl http://localhost:5000
+```
+
+To verify the API endpoint:
+
+```bash
+curl http://localhost:5000/api/server-info
 ```
 
 Expected output:
@@ -935,25 +957,20 @@ Expected output:
 
 ---
 
-## Step 6: Access the application
+## Step 7: Access the Application
 
-Open your browser and navigate to:
+Open the **Application** tab and navigate to:
 
 ```text
 http://localhost:5000
 ```
 
-or
-
-```text
-http://<server-private-ip>:5000
-```
-
-You should see the **Year Converter** web application running successfully.
+You should see the **Year Converter** application running successfully.
 
 ---
 
 ## Next Step
 
-The Flask application is now running directly on port **5000**  in application window
-Keep the terminal running while testing the application.
+The Flask application is now running directly on port **5000**.
+
+Keep the terminal session running while testing the application.
