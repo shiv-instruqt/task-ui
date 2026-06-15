@@ -12,29 +12,15 @@ apt update
 
 ---
 
-## Step 2: Install Python, pip, and Nano
+## Step 2: Install Python, pip, venv, and Nano
 
 ```bash
-apt install -y python3 python3-pip nano
+apt install -y python3 python3-pip python3-venv nano
 ```
 
 ---
 
-## Step 3: Install Flask
-
-```bash
-pip3 install flask
-```
-
-Verify the installation:
-
-```bash
-python3 -c "import flask; print(flask.__version__)"
-```
-
----
-
-## Step 3.1: Create a Python Virtual Environment
+## Step 3: Create a Python Virtual Environment
 
 ```bash
 python3 -m venv .venv
@@ -46,7 +32,7 @@ Activate the virtual environment:
 . .venv/bin/activate
 ```
 
-You should see:
+You should now see:
 
 ```text
 (.venv)
@@ -56,7 +42,21 @@ at the beginning of your terminal prompt.
 
 ---
 
-## Step 4: Create the Flask Application File
+## Step 4: Install Flask
+
+```bash
+pip install flask
+```
+
+Verify the installation:
+
+```bash
+python -c "import flask; print(flask.__version__)"
+```
+
+---
+
+## Step 5: Create the Flask Application File
 
 Run the following command:
 
@@ -935,10 +935,10 @@ EOF
 
 ---
 
-## Step 5: Run the Flask Application
+## Step 6: Run the Flask Application
 
 ```bash
-python3 app.py
+python app.py
 ```
 
 Expected output:
@@ -954,7 +954,7 @@ Expected output:
 
 ---
 
-## Step 6: Verify the Application
+## Step 7: Verify the Application
 
 Open a new terminal and run:
 
@@ -979,7 +979,7 @@ Expected output:
 
 ---
 
-## Step 7: Access the Application
+## Step 8: Access the Application
 
 Open the **Application** tab and navigate to:
 
@@ -993,6 +993,6 @@ You should see the **Year Converter** application running successfully.
 
 ## Next Step
 
-The Flask application is now running directly on port **5000**.
+The Flask application is now running directly on port **5000** using a Python virtual environment.
 
-Please refersh the application tab and u can see the app.
+Keep the terminal session running while testing the application.
