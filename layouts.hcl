@@ -1,7 +1,8 @@
 
+
 resource "layout" "single_panel" {
   column {
-    width = "100"
+    width = "50"
     tab "application" {
       title  = "application"
       target = resource.service.application
@@ -9,6 +10,12 @@ resource "layout" "single_panel" {
     tab "terminal" {
       title  = "terminal"
       target = resource.terminal.terminal
+    }
+  }
+  column {
+    width = "50"
+    instructions {
+      title = "Instructions"
     }
   }
 }

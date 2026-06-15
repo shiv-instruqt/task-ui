@@ -103,3 +103,8 @@ docker run -d \
   -p 5000:5000 \
   shivtushal/git-lab:python-app-1.0
 ```
+---
+
+## Next Step
+
+Now move to the **Terminal** tab and execute the commands above one by one to deploy the application.
