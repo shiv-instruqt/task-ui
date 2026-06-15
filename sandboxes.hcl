@@ -2,12 +2,13 @@ resource "network" "task-vpc" {
   subnet = "10.100.100.0/24"
 }
 
+
 resource "container" "task-1" {
   network {
     id = resource.network.task-vpc.meta.id
   }
   image {
-    name = "ubuntu:22.04"
+    name = "shivtushal/git-lab:python-app-1.0"
   }
   environment = {
     "Docker_user" = "shivtushal"
