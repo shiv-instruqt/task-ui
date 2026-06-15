@@ -3,12 +3,13 @@ resource "network" "task-vpc" {
 }
 
 
+
 resource "container" "task-1" {
   network {
     id = resource.network.task-vpc.meta.id
   }
   image {
-    name = "shivtushal/git-lab:python-app-1.0"
+    name = "ubuntu:22.04"
   }
   environment = {
     "Docker_user" = "shivtushal"
