@@ -34,6 +34,28 @@ python3 -c "import flask; print(flask.__version__)"
 
 ---
 
+## Step 3.1: Create a Python Virtual Environment
+
+```bash
+python3 -m venv .venv
+```
+
+Activate the virtual environment:
+
+```bash
+. .venv/bin/activate
+```
+
+You should see:
+
+```text
+(.venv)
+```
+
+at the beginning of your terminal prompt.
+
+---
+
 ## Step 4: Create the Flask Application File
 
 Run the following command:
@@ -973,4 +995,4 @@ You should see the **Year Converter** application running successfully.
 
 The Flask application is now running directly on port **5000**.
 
-Keep the terminal session running while testing the application.
+Please refersh the application tab and u can see the app.
