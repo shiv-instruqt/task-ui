@@ -1,4 +1,4 @@
- # Run the Flask Application
+# Run the Flask Application
 
 Since Docker is not available in this environment, we will run the Flask application directly using Python.
 
@@ -62,26 +62,84 @@ Run the following command:
 
 ```bash
 cat > app.py << 'EOF'
-from flask import Flask, jsonifyimport socketimport urllib.request
+from flask import Flask, jsonify
+import socket
+import urllib.request
+from datetime import datetime
 
-app = Flask(name)
+app = Flask(__name__)
 
-def get_private_ip():try:s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)s.connect(("8.8.8.8", 80))ip = s.getsockname()[0]s.close()return ipexcept Exception:return "Unavailable"
 
-def get_public_ip():try:with urllib.request.urlopen("https://api.ipify.org", timeout=5) as res:return res.read().decode("utf-8").strip()except Exception:return "Unavailable"
+def get_private_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "Unavailable"
 
-Fetch both IPs once at startup and cache them
 
-SERVER_PRIVATE_IP = get_private_ip()SERVER_PUBLIC_IP  = get_public_ip()
+def get_public_ip():
+    try:
+        with urllib.request.urlopen("https://api.ipify.org", timeout=5) as res:
+            return res.read().decode("utf-8").strip()
+    except Exception:
+        return "Unavailable"
 
-print(f"[Server] Private IP : {SERVER_PRIVATE_IP}")print(f"[Server] Public  IP : {SERVER_PUBLIC_IP}")
 
-@app.route('/api/server-info')def server_info():return jsonify({"private_ip": SERVER_PRIVATE_IP, "public_ip": SERVER_PUBLIC_IP})
+# Fetch both IPs once at startup and cache them
+SERVER_PRIVATE_IP = get_private_ip()
+SERVER_PUBLIC_IP = get_public_ip()
 
-@app.route('/')def home():html = get_html().replace('PRIVATE_IP', SERVER_PRIVATE_IP).replace('PUBLIC_IP', SERVER_PUBLIC_IP)return html
+print(f"[Server] Private IP : {SERVER_PRIVATE_IP}")
+print(f"[Server] Public  IP : {SERVER_PUBLIC_IP}")
 
-def get_html():return """
+ZODIAC = ["Monkey", "Rooster", "Dog", "Pig", "Rat", "Ox", "Tiger",
+          "Rabbit", "Dragon", "Snake", "Horse", "Goat"]
+DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+
+@app.route('/api/server-info')
+def server_info():
+    return jsonify({"private_ip": SERVER_PRIVATE_IP, "public_ip": SERVER_PUBLIC_IP})
+
+
+@app.route('/api/convert-year/<int:year>')
+def convert_year(year):
+    try:
+        is_leap = (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)
+        zodiac = ZODIAC[year % 12]
+        jan1_weekday = DAYS[datetime(year, 1, 1).weekday()]
+        century = (year - 1) // 100 + 1
+        return jsonify({
+            "year": year,
+            "is_leap_year": is_leap,
+            "zodiac_animal": zodiac,
+            "jan_1_weekday": jan1_weekday,
+            "century": century
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route('/')
+def home():
+    html = get_html().replace('PRIVATE_IP', SERVER_PRIVATE_IP).replace('PUBLIC_IP', SERVER_PUBLIC_IP)
+    return html
+
+
+def get_html():
+    return """<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Year Converter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+<style>
     /* =====================
        DARK MODE — Deep Navy Indigo
     ===================== */
@@ -150,6 +208,7 @@ def get_html():return """
         color: var(--text);
         font-family: 'DM Mono', monospace;
         overflow-x: hidden;
+        margin: 0;
     }
 
     /* === BACKGROUND GRID === */
@@ -321,6 +380,7 @@ def get_html():return """
         -webkit-text-fill-color: transparent;
         background-clip: text;
         margin-bottom: 20px;
+        margin-top: 0;
     }
 
     [data-theme="light"] h1 {
@@ -352,6 +412,7 @@ def get_html():return """
             0 0 0 1px rgba(201,168,76,0.05),
             var(--card-shadow),
             inset 0 1px 0 rgba(201,168,76,0.12);
+        box-sizing: border-box;
     }
 
     .card::before, .card::after {
@@ -440,6 +501,7 @@ def get_html():return """
         outline: none;
         transition: border-color 0.3s, box-shadow 0.3s, background 0.45s, color 0.45s;
         letter-spacing: 0.05em;
+        box-sizing: border-box;
     }
 
     input[type="text"]::placeholder {
@@ -715,46 +777,145 @@ def get_html():return """
         .ip-badge { top: 16px; left: 16px; min-width: 160px; }
     }
 </style>
+</head>
+<body>
 
-<div class="card">
-    <div class="card-inner-corner-tl"></div>
-    <div class="card-inner-corner-br"></div>
+<div class="stars" id="stars"></div>
 
-    <p class="card-label">Input</p>
-
-    <div class="input-group">
-        <label class="input-label" for="year">Enter a year</label>
-        <div class="input-wrap">
-            <input type="text" id="year" placeholder="e.g. 2024" autocomplete="off" />
-        </div>
-    </div>
-
-    <button class="btn-submit" onclick="sendData()">
-        <span class="btn-text">
-            <span>Convert Year</span>
-            <span class="btn-icon">✦</span>
-        </span>
-    </button>
-
-    <div class="result-box" id="result-box">
-        <p class="result-label">Result</p>
-        <div class="result-value" id="result-value"></div>
-    </div>
-
-    <div class="ornament">◆</div>
+<div class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">
+    <span class="icon-moon">&#127769;</span>
+    <span class="icon-sun">&#9728;</span>
+    <div class="toggle-track"><div class="toggle-knob"></div></div>
+    <span class="toggle-label">Theme</span>
 </div>
 
+<div class="ip-badge">
+    <div class="ip-row">
+        <div class="ip-dot private"></div>
+        <div class="ip-info">
+            <span class="ip-type">Private IP</span>
+            <span class="ip-value">PRIVATE_IP</span>
+        </div>
+    </div>
+    <div class="ip-row">
+        <div class="ip-dot public"></div>
+        <div class="ip-info">
+            <span class="ip-type">Public IP</span>
+            <span class="ip-value">PUBLIC_IP</span>
+        </div>
+    </div>
+</div>
+
+<div class="main-wrap">
+    <header class="site-header">
+        <p class="eyebrow">Temporal Utility</p>
+        <h1>Year Converter</h1>
+        <p class="subtitle">Enter a year to reveal its details</p>
+    </header>
+
+    <div class="card">
+        <div class="card-inner-corner-tl"></div>
+        <div class="card-inner-corner-br"></div>
+
+        <p class="card-label">Input</p>
+
+        <div class="input-group">
+            <label class="input-label" for="year">Enter a year</label>
+            <div class="input-wrap">
+                <input type="text" id="year" placeholder="e.g. 2024" autocomplete="off" />
+            </div>
+        </div>
+
+        <button class="btn-submit" onclick="sendData()">
+            <span class="btn-text">
+                <span>Convert Year</span>
+                <span class="btn-icon">&#10022;</span>
+            </span>
+        </button>
+
+        <div class="result-box" id="result-box">
+            <p class="result-label">Result</p>
+            <div class="result-value" id="result-value"></div>
+        </div>
+
+        <div class="ornament">&#9670;</div>
+    </div>
+</div>
+
+<div class="jenkins-badge">
+    <div class="jenkins-dot"></div>
+    <div class="jenkins-text">Status<strong>Server Online</strong></div>
+</div>
+
+<div class="glow-band"></div>
+
+<script>
+function toggleTheme() {
+    const root = document.documentElement;
+    const current = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+}
+
+function createStars() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 60; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.setProperty('--dur', (3 + Math.random() * 4) + 's');
+        star.style.setProperty('--delay', (Math.random() * 5) + 's');
+        star.style.setProperty('--bright', (0.4 + Math.random() * 0.5));
+        container.appendChild(star);
+    }
+}
+createStars();
+
+async function sendData() {
+    const yearInput = document.getElementById('year').value.trim();
+    const resultBox = document.getElementById('result-box');
+    const resultValue = document.getElementById('result-value');
+
+    resultBox.classList.add('show');
+
+    if (!yearInput || isNaN(yearInput)) {
+        resultValue.innerHTML = '<span style="color:#e05c2a">&#10005; Please enter a valid year</span>';
+        return;
+    }
+
+    resultValue.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+
+    try {
+        const response = await fetch('/api/convert-year/' + encodeURIComponent(yearInput));
+        const data = await response.json();
+
+        if (data.error) {
+            resultValue.innerHTML = '<span style="color:#e05c2a">&#10005; ' + data.error + '</span>';
+            return;
+        }
+
+        resultValue.innerHTML =
+            'Zodiac: ' + data.zodiac_animal + '<br>' +
+            'Leap year: ' + (data.is_leap_year ? 'Yes' : 'No') + '<br>' +
+            'Jan 1 fell on: ' + data.jan_1_weekday + '<br>' +
+            'Century: ' + data.century;
     } catch (err) {
         resultValue.innerHTML = '<span style="color:#e05c2a">&#10005; Error: ' + err.message + '</span>';
     }
 }
 
-/* === ENTER KEY === */
 document.getElementById("year").addEventListener("keydown", function (e) {
     if (e.key === "Enter") sendData();
 });
+</script>
 
-if name == 'main':app.run(host='0.0.0.0', port=5000)
+</body>
+</html>
+"""
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
 EOF
 ```
 
